@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+    <head>
+        <meta charset="UTF-8">
+        <link rel="icon" href="data:,">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <title>QRcom Receiver</title>
+    </head>
+
+    <body>
+        <h3>QRcom Receiver</h3>
+
+        <div id="info"></div>
+        <hr>
+
+        <div>
+            <button id="camera-onoff">Video On</button>
+            <span id="select-block" style="visibility: hidden">
+                <select id="camera-selector"></select>
+            </span>
+        </div>
+
+        <hr>
+
+        <div>
+            <video id="video-block" width="320" height="240" autoplay></video>
+        </div>
+
+        <hr>
+        <div id="progress" width="80%"></div>
+        <textarea id="result" rows="10" cols="40" readonly></textarea>
+
+        <div>
+            <canvas id="canvas-block" width="320" height="240" style="display:none"></canvas>
+        </div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.3.1/dist/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.2/pako.min.js"></script>
+<!--
+<script src="jsQR.1.3.1.js"></script>
+<script src="pako.2.0.2.js"></script>
+-->
+<script src="qrcom-param.js"></script>
+<script>
+
+const btnCameraOnOff = document.getElementById('camera-onoff');
+const btnCameraFlip = document.getElementById('camera-flip');
+const blkSelect = document.getElementById('select-block');
+const selCamera = document.getElementById('camera-selector');
+const bVideo = document.getElementById('video-block');
+
+btnCameraOnOff.onclick = video_on;
+selCamera.onchange = video_change;
+
+function video_on()
+{
+    // 既に選択肢を得られている場合は選択されたデバイスを指定する。
+    let vConstraints;
+
+    if (selCamera.length === 0) {
+        vConstraints = { facingMode: { exact: 'environment' } };
+    } else {
+        vConstraints = { deviceId: { exact: selCamera.selectedOptions[0].value } };
+    };
+
+    // asking the access right to a camera.
+    navigator.mediaDevices.getUserMedia({ video: vConstraints, audio: false })
+        .then(stream => stream_start(stream))
+        .catch(function(err) {
+            if (err.name == 'OverconstrainedError') {
+                // if OverconstrainedError, then let a user choose a device.
+                const constraintsUserChoice = { video: true, audio: false };
+                navigator.mediaDevices.getUserMedia(constraintsUserChoice)
+                    .then(stream => stream_start(stream))
+                    .catch(function(err) {
+                        let msg = `ERROR: video_on:${err.name}:${err.message}`;
+                        console.log(msg);
+                        throw msg;
+                    });
+            } else {
+                alert(`${err}`);
+            }
+        });
+};
+
+function video_off()
+{
+    if (bVideo.srcObject === null)
+        return;
+
+    bVideo.srcObject.getTracks().forEach(function(track) {
+        track.stop();
+    });
+    bVideo.srcObject = null;
+    btnCameraOnOff.innerText = 'Video On';
+    btnCameraOnOff.onclick = video_on;
+};
+
+function video_change()
+{
+    video_off();
+    video_on();
+}
+
+function stream_start(stream)
+{
+    bVideo.srcObject = stream;
+    make_media_selector(stream);
+    btnCameraOnOff.innerText = 'Video Off';
+    btnCameraOnOff.onclick = video_off;
+}
+
+function make_media_selector(stream)
+{
+    // 既に選択リストができていれば処理せずに抜けることも考えられるが、
+    // 後から追加される場合もあるので毎回作る。
+
+    while (selCamera.options.length > 0) {
+        selCamera.remove(0);
+    }
+
+    // 既に選択されているデバイスがあれば deviceIdを取得する。
+    // 選択しているデバイスにselectedにするため。
+    let selected_devid;
+    if (stream) {
+        selected_devid = stream.getTracks()[0].getSettings().deviceId;
+    }
+
+    // enumerateDevices()でデバイスのリストを得る。
+    // videoinputだけを得る。
+    // select optionsを作る。
+    // 既に選択されているデバイスがあれば selected にする。
+    navigator.mediaDevices.enumerateDevices()
+    .then(devs => {
+        devs.filter(d => d.kind == 'videoinput' && d.label !== '')
+            .forEach(d => {
+                let newOption = document.createElement('option');
+                newOption.appendChild(document.createTextNode(d.label));
+                newOption.setAttribute('value', d.deviceId);
+                if (d.deviceId === selected_devid) {
+                    newOption.setAttribute('selected', true);
+                }
+                selCamera.appendChild(newOption);
+            });
+        if (selCamera.options.length !== 0) {
+            blkSelect.setAttribute('style', 'visibility: visible');
+        }
+    });
+}
+
+/*
+ref.
+https://developer.mozilla.org/ja/docs/Web/Guide/Audio_and_video_manipulation
+*/
+var processor = {
+
+    decode: function(data) {
+        // XXX need to shrink the code.
+        let data_b64  = atob(this.frags.join(''));
+        let data_mid = new Uint8Array(data_b64.length);
+        data_mid.forEach((el, idx, arr)=>{ arr[idx] = data_b64.charCodeAt(idx); });
+        let data_unz = pako.ungzip(data_mid);
+        let data_data = (new TextDecoder).decode(Uint8Array.of(...data_unz));
+
+        this.result.appendChild(document.createTextNode(data_data));
+    },
+
+    read_qrcode: function() {
+        this.video.drawImage(bVideo, 0, 0, bVideo.width, bVideo.height);
+        let frame = this.video.getImageData(0, 0, bVideo.width, bVideo.height);
+        let qrcode = jsQR(frame.data, frame.width, frame.height);
+        if (qrcode) {
+            // nb_frags は 1 origin
+            // frag_idx は 0 origin
+            let nb_frags = 1+qrcom_frag_idx.indexOf(qrcode.data[0]);
+            let frag_idx = qrcom_frag_idx.indexOf(qrcode.data[1]);
+            //console.log(`${1+frag_idx}/${nb_frags} `);
+            this.frags[frag_idx] = qrcode.data.slice(2);
+            let finished = true;
+            this.progs.innerText = '';
+            for (let i = 0; i < nb_frags; i++) {
+                let f = document.createElement('span');
+                f.appendChild(document.createTextNode(`${i+1} `));
+                this.progs.appendChild(f);
+                if (!this.frags[i]) {   // maybe undefined
+                    f.setAttribute('style', `color:${qrcom_color_notyet}`);
+                    finished = false;
+                } else {
+                    f.setAttribute('style', `color:${qrcom_color_done}`);
+                }
+            }
+            return finished;
+        }
+        return false; // still read.
+    },
+
+    read_qrcode_cb: function() {
+        if (bVideo.paused || bVideo.ended) {
+            return;
+        }
+        if (!this.read_qrcode()) {
+            setTimeout(() => {
+                this.read_qrcode_cb();
+            }, camera_read_interval);
+        } else {
+            console.log('finished');
+            this.decode();
+        }
+    },
+
+    run: function() {
+        this.video = document.getElementById('canvas-block').getContext('2d');
+        //this.progs = document.getElementById('progress').getContext('2d');
+        this.progs = document.getElementById('progress');
+        this.result = document.getElementById('result');
+        this.frags = [];
+        bVideo.addEventListener('play', () => {
+            this.read_qrcode_cb();
+        }, false);
+    }
+};
+
+processor.run();
+
+        </script>
+    </body>
+</html>
+

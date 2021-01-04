@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="icon" href="data:,">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <title>QRcom Sender </title>
+    </head>
+
+    <body>
+        <h3>QRcom Sender</h3>
+
+        <div>
+            <div>
+                <textarea id="data" rows="10" cols="40"></textarea>
+            </div>
+            <button id="button-gen" onclick="generate_qrcodes()">コード生成</button>
+            <button id="button-passing"></button>
+        </div>
+        <div id="info"></div>
+        <hr>
+        <div id="view-qrcode" style="position:relative">
+        </div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.2/pako.min.js"></script>
+<!--
+<script src="qrcode.1.4.4.js"></script>
+<script src="pako.2.0.2.js"></script>
+-->
+<script src="qrcom-param.js"></script>
+<script>
+
+const dInputData = document.getElementById("data");
+const dInfo = document.getElementById("info");
+const dView = document.getElementById("view-qrcode");
+let qrcodes = [];
+
+function make_qrcode(nb_frags, frag_idx, data)
+{
+    let hdr = `${qrcom_frag_idx[nb_frags-1]}${qrcom_frag_idx[frag_idx]}`;
+    QRCode.toCanvas(hdr+data, qrcom_gen_opts, function (err, canvas) {
+        if (err) throw err;
+        // succeeded.
+        // store QR codes for passing print mode.
+        canvas.classList.add('qrcode');
+        qrcodes[frag_idx] = canvas;
+        // print QR codes at once.
+        let c = canvas.getContext('2d');
+        c.translate(0, 8);
+        // to print the index, needs to add +1
+        // because it is an index of 0 origin.
+        c.fillText(`${frag_idx+1}/${nb_frags}`,0,0);
+        dView.appendChild(canvas);
+        // for debug code to print the image data of the QR code.
+        // console.log(`qr ${frag_idx+1}/${nb_frags+1}:`, canvas.toDataURL());
+    })
+}
+
+function init_views()
+{
+    // id == scope 以外を削除する。
+    let scope = undefined;
+    while (dView.firstChild) {
+        if (dView.firstChild.id == 'scope') {
+            scope = dView.removeChild(dView.firstChild);
+        } else {
+            dView.removeChild(dView.firstChild);
+        }
+    }
+    if (scope) {
+        dView.appendChild(scope);
+    }
+}
+
+function generate_qrcodes()
+{
+    // initialize.
+    init_views();
+    qrcodes = [];
+
+    // compressing and transforming into base64.
+    let src_z = pako.gzip(dInputData.value);
+    let data_b64 = btoa(String.fromCharCode(...src_z));
+
+    // just printing the effect of the encoding and compression.
+    let orig_len = (new TextEncoder).encode(dInputData.value).length;
+    dInfo.innerText = `${orig_len} bytes of text into ${data_b64.length} bytes in base64 compressed`;
+
+    // generating QR codes.
+    let nb_frags = Math.ceil(data_b64.length / max_data_len);
+    if (nb_frags <= qrcom_max_nb_frags) {
+        // nb_frags: 1 origin
+        // frag_idx: 0 origin
+        for (let i = 0; i < nb_frags; i++) {
+            let bp = i * max_data_len;
+            make_qrcode(nb_frags, i, data_b64.slice(bp,bp+max_data_len));
+        }
+    } else {
+        let msg = `data length must be less than ${qrcom_max_nb_frags*max_data_len}, but ${data_b64.length}`;
+        dInfo.innerText = msg;
+        throw msg;
+    }
+}
+
+// QR code passing
+var passing_qrcodes = {
+
+    show_scope: function() {
+        // drawing red rectangle at the first QR code.
+        if (this._qrcodes.length == 0) {
+            // do nothing.
+            return;
+        }
+        let w = this._qrcodes[0].width+4;
+        let h = this._qrcodes[0].height+4;
+        this.cvScope = document.createElement('canvas');
+        this.cvScope.width = w;
+        this.cvScope.height = h;
+        this.cvScope.id = 'scope';
+        this.cvScope.style.cssText += 'position:absolute';
+        this.cvScope.style.cssText += 'top:-2px;left:-2px';
+        dView.appendChild(this.cvScope);
+        let ctx = this.cvScope.getContext('2d');
+        ctx.strokeStyle = `${qrcom_color_passing}`;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0,0,w,h);
+    },
+
+    remove_scope: function() {
+        if (this.cvScope == false) {
+            // do nothing.
+            return;
+        }
+        dView.removeChild(this.cvScope);
+        this.cvScope = false;
+    },
+
+    init: function() {
+        this.btn = document.getElementById("button-passing");
+        this.btn.innerText = '連続表示準備';
+        this.btn.onclick = this.prepare.bind(this);
+    },
+
+    prepare: function() {
+        if (qrcodes.length == 0) {
+            dInfo.innerText = `Any QR codes have not been generated yet.`;
+            return;
+        }
+        this._qrcodes = qrcodes.concat();
+        this.show_scope();
+        this.btn.innerText = '連続表示開始';
+        this.btn.onclick = this.start.bind(this);
+    },
+
+    passing_cb: function() {
+        if (this.frag_idx < this._qrcodes.length) {
+            init_views();
+            this._qrcodes.push(this._qrcodes.shift());
+            for (let i = 0; i < this._qrcodes.length; i++) {
+                dView.appendChild(this._qrcodes[i]);
+            }
+            this.frag_idx++;
+            setTimeout(this.passing_cb.bind(this), 1500);
+        } else {
+            this.btn.innerText = '連続表示準備';
+            this.btn.onclick = this.prepare.bind(this);
+            this.remove_scope();
+        }
+    },
+
+    start: function() {
+        this.frag_idx = 0;
+        this.passing_cb();
+    }
+};
+passing_qrcodes.init()
+
+</script>
+
+    </body>
+</html>
+
