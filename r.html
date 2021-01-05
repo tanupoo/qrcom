@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width,initial-scale=1">
 
         <title>QRcom Receiver</title>
+
     </head>
 
     <body>
@@ -16,7 +17,7 @@
         <hr>
 
         <div>
-            <button id="camera-onoff">Video On</button>
+            <button id="camera-onoff"></button>
             <span id="select-block" style="visibility: hidden">
                 <select id="camera-selector"></select>
             </span>
@@ -51,8 +52,9 @@ const blkSelect = document.getElementById('select-block');
 const selCamera = document.getElementById('camera-selector');
 const bVideo = document.getElementById('video-block');
 
-btnCameraOnOff.onclick = video_on;
 selCamera.onchange = video_change;
+btnCameraOnOff.onclick = video_on;
+btnCameraOnOff.innerText = qrcom_btn_camera_on;
 
 function video_on()
 {
@@ -94,8 +96,8 @@ function video_off()
         track.stop();
     });
     bVideo.srcObject = null;
-    btnCameraOnOff.innerText = 'Video On';
     btnCameraOnOff.onclick = video_on;
+    btnCameraOnOff.innerText = qrcom_btn_camera_on;
 };
 
 function video_change()
@@ -108,8 +110,8 @@ function stream_start(stream)
 {
     bVideo.srcObject = stream;
     make_media_selector(stream);
-    btnCameraOnOff.innerText = 'Video Off';
     btnCameraOnOff.onclick = video_off;
+    btnCameraOnOff.innerText = qrcom_btn_camera_off;
 }
 
 function make_media_selector(stream)

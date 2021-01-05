@@ -13,6 +13,19 @@ const qrcom_color_passing = '#d55e00';
 // maximum data size in byte per a QR code.
 const max_data_len = 512;
 
+// multi-language
+const qrcom_btn_camera_on = 'Camera ON';
+const qrcom_btn_camera_off = 'Camera OFF';
+const qrcom_btn_gen = 'Make QR code';
+const qrcom_btn_passing_prepare = 'QR code passing';
+const qrcom_btn_passing_start = 'Start passing';
+
+//const qrcom_btn_camera_on = 'カメラ起動';
+//const qrcom_btn_camera_off = 'カメラ停止';
+//const qrcom_btn_gen = 'コード生成';
+//const qrcom_btn_passing_prepare = '連続表示準備';
+//const qrcom_btn_passing_start = '連続表示開始';
+
 /*
  * 2 Byte Header
  *   1バイト目: 総フラグメント数を示す。'A'ならば1個。'9'ならば62個。
