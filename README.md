@@ -5,6 +5,9 @@ data sender and data receiver by QR codes.
 
 ## How it works.
 
+<img alt="video of a sample for the sender side" src="sample/sample-s.gif" width="320">
+<img alt="video of a sample for the receiver side" src="sample/sample-r.gif" width="320">
+
 Prepare two devices.  One for generating QR codes, another for reading the QR codes.
 So, at least the one device needs camera.
 
