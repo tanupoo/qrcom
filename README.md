@@ -3,6 +3,8 @@ QRCom
 
 data sender and data receiver by QR codes.
 
+日本語のREADMEは[こちら](README.ja.md)。
+
 ## How it works.
 
 <img alt="video of a sample for the sender side" src="sample/sample-s.gif" width="320">
