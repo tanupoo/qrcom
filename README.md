@@ -8,8 +8,12 @@ data sender and data receiver by QR codes.
 ## How it works.
 
 <span>
-    <img alt="video of a sample for the sender side" src="sample/sample-s.gif" height="480" style="border:2px solid">
-    <img alt="video of a sample for the receiver side" src="sample/sample-r.gif" height="480" style="border:2px solid">
+    <kbd>
+        <img alt="video of a sample for the sender side" src="sample/sample-s.gif" height="480">
+    </kbd>
+    <kbd>
+        <img alt="video of a sample for the receiver side" src="sample/sample-r.gif" height="480">
+    </kbd>
 </span>
 
 Prepare two devices.  One for generating QR codes, another for reading the QR codes.
