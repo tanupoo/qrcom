@@ -46,6 +46,8 @@
 <script src="qrcom-param.js"></script>
 <script>
 
+const qm = qrcom_msg.init(qrcom_lang);
+
 const btnCameraOnOff = document.getElementById('camera-onoff');
 const btnCameraFlip = document.getElementById('camera-flip');
 const blkSelect = document.getElementById('select-block');
@@ -54,7 +56,7 @@ const bVideo = document.getElementById('video-block');
 
 selCamera.onchange = video_change;
 btnCameraOnOff.onclick = video_on;
-btnCameraOnOff.innerText = qrcom_btn_camera_on;
+btnCameraOnOff.innerText = qm.btn_camera_on;
 
 function video_on()
 {
@@ -97,7 +99,7 @@ function video_off()
     });
     bVideo.srcObject = null;
     btnCameraOnOff.onclick = video_on;
-    btnCameraOnOff.innerText = qrcom_btn_camera_on;
+    btnCameraOnOff.innerText = qm.btn_camera_on;
 };
 
 function video_change()
@@ -111,7 +113,7 @@ function stream_start(stream)
     bVideo.srcObject = stream;
     make_media_selector(stream);
     btnCameraOnOff.onclick = video_off;
-    btnCameraOnOff.innerText = qrcom_btn_camera_off;
+    btnCameraOnOff.innerText = qm.btn_camera_off;
 }
 
 function make_media_selector(stream)

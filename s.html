@@ -32,6 +32,8 @@
 <script src="qrcom-param.js"></script>
 <script>
 
+const qm = qrcom_msg.init(qrcom_lang);
+
 const dInputData = document.getElementById("data");
 const dInfo = document.getElementById("info");
 const dView = document.getElementById("view-qrcode");
@@ -39,7 +41,7 @@ let qrcodes = [];
 
 const btnGen = document.getElementById("button-gen");
 btnGen.onclick = generate_qrcodes;
-btnGen.innerText = qrcom_btn_gen;
+btnGen.innerText = qm.btn_gen;
 
 function make_qrcode(nb_frags, frag_idx, data)
 {
@@ -148,7 +150,7 @@ var passing_qrcodes = {
 
     init: function() {
         this.btn = document.getElementById("button-passing");
-        this.btn.innerText = qrcom_btn_passing_prepare;
+        this.btn.innerText = qm.btn_passing_prepare;
         this.btn.onclick = this.prepare.bind(this);
     },
 
@@ -159,7 +161,7 @@ var passing_qrcodes = {
         }
         this._qrcodes = qrcodes.concat();
         this.show_scope();
-        this.btn.innerText = qrcom_btn_passing_start;
+        this.btn.innerText = qm.btn_passing_start;
         this.btn.onclick = this.start.bind(this);
     },
 

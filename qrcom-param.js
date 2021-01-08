@@ -1,4 +1,3 @@
-
 // maximum data size in byte per a QR code.
 // note: corelation to the number of the version and errorCorrectionLevel.
 // see https://www.qrcode.com/en/about/version.html
@@ -17,19 +16,31 @@ const qrcom_color_done = '#56b4e9';
 const qrcom_color_notyet = '#d55e00';
 const qrcom_color_passing = '#d55e00';
 
-// multi-language
-const qrcom_btn_camera_on = 'Camera ON';
-const qrcom_btn_camera_off = 'Camera OFF';
-const qrcom_btn_gen = 'Make QR code';
-const qrcom_btn_passing_prepare = 'QR code passing';
-const qrcom_btn_passing_start = 'Start passing';
+// language
+const qrcom_lang = 'en';
 
-//const qrcom_btn_camera_on = 'カメラ起動';
-//const qrcom_btn_camera_off = 'カメラ停止';
-//const qrcom_btn_gen = 'コード生成';
-//const qrcom_btn_passing_prepare = '連続表示準備';
-//const qrcom_btn_passing_start = '連続表示開始';
+// don't need to touch unless you want to add other language.
+const qrcom_msg = {
+    init: function(lang) {
+        this.lang = lang;
+        if (lang == 'ja') {
+            this.btn_camera_on = 'カメラ起動';
+            this.btn_camera_off = 'カメラ停止';
+            this.btn_gen = 'コード生成';
+            this.btn_passing_prepare = '連続表示準備';
+            this.btn_passing_start = '連続表示開始';
+        } else {
+            this.btn_camera_on = 'Camera ON';
+            this.btn_camera_off = 'Camera OFF';
+            this.btn_gen = 'Make QR code';
+            this.btn_passing_prepare = 'QR code passing';
+            this.btn_passing_start = 'Start passing';
+        }
+        return this
+    },
+};
 
+// interval in milisecond to take an image and trying to get QR code.
 const camera_read_interval = 16;
 
 /*
