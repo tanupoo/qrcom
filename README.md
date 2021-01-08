@@ -24,7 +24,7 @@ Many browsers require a secure connection to get an access right to camera.
 
 Access to s.html from one device,
 and put any string including multi-bytes string into the textarea.
-Then click 'コード生成'.  It shows the QR codes encoded the string you put.
+Then click 'Make QR code'.  It shows the QR codes encoded the string you put.
 
 Access to r.html from another device.
 You have to give a permission to access the camera for your browser.
@@ -34,9 +34,9 @@ it will decode the set of QR codes,
 and you can see the string in the textarea,
 which you put on the other device.
 
-For easy to read QR codes, you can click '連続表示準備' once.
+For easy to read QR codes, you can click 'QR code passing' once.
 Then, you can see a red rectangle around the first QR code.
-Forcus on it and hold on, then click '連続表示開始'.
+Forcus on it and hold on, then click 'Start passing'.
 The QR codes will be displayed in order.
 
 ## License
