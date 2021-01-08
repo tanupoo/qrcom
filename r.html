@@ -44,6 +44,7 @@
 <script src="pako.2.0.2.js"></script>
 -->
 <script src="qrcom-param.js"></script>
+<script src="basex.js"></script>
 <script>
 
 const qm = qrcom_msg.init(qrcom_lang);
@@ -162,12 +163,8 @@ var processor = {
 
     decode: function(data) {
         // XXX need to shrink the code.
-        let data_b64  = atob(this.frags.join(''));
-        let data_mid = new Uint8Array(data_b64.length);
-        data_mid.forEach((el, idx, arr)=>{ arr[idx] = data_b64.charCodeAt(idx); });
-        let data_unz = pako.ungzip(data_mid);
-        let data_data = (new TextDecoder).decode(Uint8Array.of(...data_unz));
-
+        var data_b45 = basex_decode(this.frags.join(''), qrcom_alphabet);
+        let data_data = (new TextDecoder).decode(pako.ungzip(data_b45));
         this.result.appendChild(document.createTextNode(data_data));
     },
 

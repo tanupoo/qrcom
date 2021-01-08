@@ -30,6 +30,7 @@
 <script src="pako.2.0.2.js"></script>
 -->
 <script src="qrcom-param.js"></script>
+<script src="basex.js"></script>
 <script>
 
 const qm = qrcom_msg.init(qrcom_lang);
@@ -93,7 +94,7 @@ function generate_qrcodes()
 
     // compressing and transforming into base64.
     let src_z = pako.gzip(dInputData.value);
-    let data_b64 = btoa(String.fromCharCode(...src_z));
+    var data_b64 = basex_encode(String.fromCharCode(...src_z), qrcom_alphabet);
 
     // just printing the effect of the encoding and compression.
     let orig_len = (new TextEncoder).encode(dInputData.value).length;

@@ -1,19 +1,6 @@
 // language
 const qrcom_lang = 'en';
 
-// maximum data size in byte per a QR code.
-// note: corelation to the number of the version and errorCorrectionLevel.
-// see https://www.qrcode.com/en/about/version.html
-const max_data_len = 512;
-
-// version 15 (77x77), scale 4px looks suitable for PDA display.
-// It results the capacity is 512 bytes.
-const qrcom_gen_opts = {
-    errorCorrectionLevel: "L", // Error Correction Level: L, M (default), Q, H
-    version: 15, // 1 to 40
-    scale: 4, // in px
-};
-
 // colors whether a QR code has been successfully received or not.
 const qrcom_color_done = '#56b4e9';
 const qrcom_color_notyet = '#d55e00';
@@ -46,6 +33,24 @@ const qrcom_msg = {
 
 // ********
 // Below should not be changed.
+
+// maximum data size in byte per a QR code.
+// note: corelation to the number of the version and errorCorrectionLevel.
+// see https://www.qrcode.com/en/about/version.html
+// the value must be minus 2 (for QRcom header size defined below).
+//const max_data_len = 518;
+const max_data_len = 756;
+
+// version 15 (77x77), scale 4px looks suitable for PDA display.
+// It results the capacity is 512 bytes.
+const qrcom_gen_opts = {
+    errorCorrectionLevel: "L", // Error Correction Level: L, M (default), Q, H
+    version: 15, // 1 to 40
+    scale: 4, // in px
+};
+
+// QR code's Alphanumeric. i.e. BASE45, not BASE62.
+const qrcom_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:"
 
 /*
  * 2 Byte Header
