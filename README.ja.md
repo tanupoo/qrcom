@@ -30,17 +30,19 @@ QRコードは認知度が高いので、
 
 QRコードは、QRコード自体の大きさとエラー訂正率(ECC Level)が決まると、
 エンコードできるバイト数が決まります。
+フラグメントを処理するヘッダに2バイト使っています。
 
 ```
 Module size   77x77
 Dot size      4
 ECC Level     L
-Capacity      520
+Capacity      756 (Alphanumeric 758)
 ```
 
 https://www.qrcode.com/en/about/version.html
 
 ## 設定
 
-see qrcom-param.js
+日本語表示に切り替えられます。
+詳しくは qrcom-param.js を見て下さい。
 
