@@ -1,5 +1,6 @@
 /*
 derived from https://github.com/paulmillr/micro-base58/blob/master/index.js
+with small modifications.
 */
 
 function bytesToHex(uint8a)
