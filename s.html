@@ -48,7 +48,10 @@ function make_qrcode(nb_frags, frag_idx, data)
 {
     let hdr = `${qrcom_frag_idx[nb_frags-1]}${qrcom_frag_idx[frag_idx]}`;
     QRCode.toCanvas(hdr+data, qrcom_gen_opts, function (err, canvas) {
-        if (err) throw err;
+        if (err) {
+            dInfo.innerText = err;
+            throw err;
+        }
         // succeeded.
         // store QR codes for passing print mode.
         canvas.classList.add('qrcode');
@@ -98,7 +101,7 @@ function generate_qrcodes()
 
     // just printing the effect of the encoding and compression.
     let orig_len = (new TextEncoder).encode(dInputData.value).length;
-    dInfo.innerText = `${orig_len} bytes of text into ${src_z.length} bytes of gzip, and ${data_b64.length} bytes of base45 encoded`;
+    dInfo.innerText = `${orig_len} bytes of text into ${src_z.length} bytes of gzip, and ${data_b64.length} bytes of base45 encoded.`;
 
     // generating QR codes.
     let nb_frags = Math.ceil(data_b64.length / max_data_len);
@@ -110,7 +113,7 @@ function generate_qrcodes()
             make_qrcode(nb_frags, i, data_b64.slice(bp,bp+max_data_len));
         }
     } else {
-        let msg = `data length must be less than ${qrcom_max_nb_frags*max_data_len}, but ${data_b64.length}`;
+        let msg = `ERROR: data length after compression must be less than ${qrcom_max_nb_frags*max_data_len} bytes, but ${data_b64.length} bytes.`;
         dInfo.innerText = msg;
         throw msg;
     }
