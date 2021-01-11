@@ -67,3 +67,7 @@ MIT License
     + https://github.com/nodeca/pako
     + MIT License
 
+- Micro-base58
+    + Note: functions encode,decode,bytesToHex taken from index.js, with a few modications to support base45, stored into basex.js.
+    + https://github.com/paulmillr/micro-base58
+    + MIT License
