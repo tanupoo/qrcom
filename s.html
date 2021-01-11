@@ -94,7 +94,7 @@ function generate_qrcodes()
 
     // compressing and transforming into base64.
     let src_z = pako.gzip(dInputData.value);
-    var data_b64 = basex_encode(String.fromCharCode(...src_z), qrcom_alphabet);
+    var data_b64 = basex_encode(src_z, qrcom_alphabet);
 
     // just printing the effect of the encoding and compression.
     let orig_len = (new TextEncoder).encode(dInputData.value).length;
