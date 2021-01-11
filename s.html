@@ -98,7 +98,7 @@ function generate_qrcodes()
 
     // just printing the effect of the encoding and compression.
     let orig_len = (new TextEncoder).encode(dInputData.value).length;
-    dInfo.innerText = `${orig_len} bytes of text into ${data_b64.length} bytes in base64 compressed`;
+    dInfo.innerText = `${orig_len} bytes of text into ${src_z.length} bytes of gzip, and ${data_b64.length} bytes of base45 encoded`;
 
     // generating QR codes.
     let nb_frags = Math.ceil(data_b64.length / max_data_len);

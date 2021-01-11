@@ -50,16 +50,17 @@ const qrcom_gen_opts = {
 };
 
 // QR code's Alphanumeric. i.e. BASE45, not BASE62.
+// qrcom_alphabet is also used as the fragment index.
 const qrcom_alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:"
 
 /*
  * 2 Byte Header
- *   1B: The number of fragments. e.g. 'A' means 1. '9' means 62.
- *   2B: Fragment index. e.g. 'A' means the first fragment.
+ *   1B: The number of fragments. e.g. '0' means 1. ':' means 62.
+ *   2B: Fragment index. e.g. '0' means the first fragment.
  *   e.g. If there is only one fragment, the header of the first fragment
- *        is 'A', 'A'.
- *   e.g. If the total number of fragment is 3, the header of the first
- *        fragment is 'C', 'A'.
+ *        is '0', '0'.
+ *   e.g. If the total number of fragment is 12, the header of the first
+ *        fragment is 'B', '0'.
  */
-const qrcom_frag_idx = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-const qrcom_max_nb_frags = qrcom_frag_idx.length;
+const qrcom_frag_idx = qrcom_alphabet;
+const qrcom_max_nb_frags = qrcom_alphabet.length;
